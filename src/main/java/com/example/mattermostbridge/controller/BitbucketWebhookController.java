@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping(BitbucketWebhookController.BITBUCKET_WEBHOOKS_URI)
 @Slf4j
 public class BitbucketWebhookController {
-    public static final String BITBUCKET_WEBHOOKS_URI = "/hooks";
+    static final String BITBUCKET_WEBHOOKS_URI = "/hooks";
     private static final String MATTERMOST_URL_TEMPLATE = "%s/%s";
     private final RestTemplate restTemplate;
     private final ConversionService conversionService;
@@ -32,8 +32,7 @@ public class BitbucketWebhookController {
     }
 
     @PostMapping(value = "/{hook}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void hook(@RequestBody BitbucketMessage bitbucketMessage,
-                     @PathVariable("hook") String hook) {
+    public void hook(@RequestBody BitbucketMessage bitbucketMessage, @PathVariable("hook") String hook) {
         MattermostMessage mattermostMessage = conversionService.convert(bitbucketMessage, MattermostMessage.class);
 
         String url = String.format(MATTERMOST_URL_TEMPLATE, mattermostUrl, hook);
