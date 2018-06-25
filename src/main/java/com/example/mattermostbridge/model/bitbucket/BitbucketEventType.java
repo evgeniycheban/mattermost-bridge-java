@@ -2,7 +2,6 @@ package com.example.mattermostbridge.model.bitbucket;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -44,7 +43,7 @@ public enum BitbucketEventType {
         }
 
         @Override
-        public BitbucketEventType deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+        public BitbucketEventType deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
             String key = jsonParser.readValueAs(String.class);
 
             return Arrays.stream(values())
