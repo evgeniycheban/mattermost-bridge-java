@@ -4,7 +4,6 @@ import com.example.mattermostbridge.model.bitbucket.BitbucketMessage;
 import com.example.mattermostbridge.model.mattermost.MattermostMessage;
 import com.example.mattermostbridge.model.mattermost.MattermostRequest;
 import com.example.mattermostbridge.service.MattermostService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.MediaType;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/hooks")
-@Slf4j
 public class BitbucketMessageController {
     private final ConversionService conversionService;
     private final MattermostService mattermostService;

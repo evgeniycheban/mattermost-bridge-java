@@ -13,7 +13,11 @@ webhook.icon.url=<message_icon_url>
 `mvn package`
 
 ## Run
-`java -jar ./target/mattermost-bridge-0.0.1-SNAPSHOT.jar`
+`java -jar ./target/mattermost-bridge.jar`
+
+## Docker
+* `docker build -t mattermost-bridge .`
+* `docker run -p 8080:8080 mattermost-bridge`
 
 ## TODO
 * tests
