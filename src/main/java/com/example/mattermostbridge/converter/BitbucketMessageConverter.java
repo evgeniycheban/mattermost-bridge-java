@@ -5,12 +5,21 @@ import com.example.mattermostbridge.model.mattermost.MattermostAttachment;
 import com.example.mattermostbridge.model.mattermost.MattermostMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
 @Component
-public class BitbucketMessageConverter {
+public class BitbucketMessageConverter implements Converter<BitbucketMessage, MattermostMessage> {
+    private static final String COLOR = "#FFFFFF";
+    private static final String AUTHOR_NAME_TEMPLATE = "%s (%s)";
+    private static final String AUTHOR_LINK_TEMPLATE = "%s/users/%s";
+    private static final String AUTHOR_ICON_TEMPLATE = "%s/users/%s/avatar.png";
+    private static final String TEXT_TEMPLATE = "%s pull request %s";
+    private static final String REPOSITORY_URL_TEMPLATE = "%s/projects/%s/repos/%s";
+    private static final String PULL_REQUEST_URL_TEMPLATE = "%s/pull-requests/%s/overview";
+    private static final String PULL_REQUEST_LINK_TEMPLATE = "[%s](%s)";
     private final String bitbucketUrl;
     private final String username;
     private final String iconUrl;
@@ -24,7 +33,8 @@ public class BitbucketMessageConverter {
         this.iconUrl = iconUrl;
     }
 
-    public MattermostMessage convertToMuttermostMessage(BitbucketMessage data) {
+    @Override
+    public MattermostMessage convert(BitbucketMessage data) {
         BitbucketPullRequest pullRequest = data.getPullRequest();
         BitbucketPullRequestSource toRef = pullRequest.getToRef();
         BitbucketRepository repository = toRef.getRepository();
@@ -33,17 +43,16 @@ public class BitbucketMessageConverter {
         BitbucketEventType eventKey = data.getEventKey();
 
         String actorName = actor.getName();
-        String repositoryUrl = String.format("%s/projects/%s/repos/%s", bitbucketUrl,
-                project.getKey(), repository.getName());
-        String pullRequestUrl = String.format("%s/pull-requests/%s/overview", repositoryUrl, pullRequest.getId());
-        String pullRequestLink = String.format("[%s](%s)", pullRequest.getTitle(), pullRequestUrl);
+        String repositoryUrl = String.format(REPOSITORY_URL_TEMPLATE, bitbucketUrl, project.getKey(), repository.getName());
+        String pullRequestUrl = String.format(PULL_REQUEST_URL_TEMPLATE, repositoryUrl, pullRequest.getId());
+        String pullRequestLink = String.format(PULL_REQUEST_LINK_TEMPLATE, pullRequest.getTitle(), pullRequestUrl);
 
         MattermostAttachment attachment = MattermostAttachment.builder()
-                .color("#FFFFFF")
-                .authorName(String.format("%s (%s)", actor.getDisplayName(), actorName))
-                .authorLink(String.format("%s/users/%s", bitbucketUrl, actorName))
-                .authorIcon(String.format("%s/users/%s/avatar.png", bitbucketUrl, actorName))
-                .text(String.format("%s pull request %s", eventKey.getValue(), pullRequestLink))
+                .color(COLOR)
+                .authorName(String.format(AUTHOR_NAME_TEMPLATE, actor.getDisplayName(), actorName))
+                .authorLink(String.format(AUTHOR_LINK_TEMPLATE, bitbucketUrl, actorName))
+                .authorIcon(String.format(AUTHOR_ICON_TEMPLATE, bitbucketUrl, actorName))
+                .text(String.format(TEXT_TEMPLATE, eventKey.getValue(), pullRequestLink))
                 .build();
 
         return MattermostMessage.builder()
