@@ -13,17 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
-@RequestMapping(BitbucketWebhookController.BITBUCKET_WEBHOOKS_URI)
+@RequestMapping("/hooks")
 @Slf4j
-public class BitbucketWebhookController {
-    static final String BITBUCKET_WEBHOOKS_URI = "/hooks";
+public class BitbucketMessageController {
     private static final String MATTERMOST_URL_TEMPLATE = "%s/%s";
     private final RestTemplate restTemplate;
     private final ConversionService conversionService;
     private final String mattermostUrl;
 
     @Autowired
-    public BitbucketWebhookController(RestTemplate restTemplate,
+    public BitbucketMessageController(RestTemplate restTemplate,
                                       ConversionService conversionService,
                                       @Value("${webhook.mattermost.url}") String mattermostUrl) {
         this.restTemplate = restTemplate;
