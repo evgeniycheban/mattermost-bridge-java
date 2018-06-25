@@ -1,7 +1,6 @@
 package com.example.mattermostbridge.converter;
 
-import com.example.mattermostbridge.model.bitbucket.BitbucketMessage;
-import com.example.mattermostbridge.model.bitbucket.BitbucketPullRequest;
+import com.example.mattermostbridge.model.bitbucket.*;
 import com.example.mattermostbridge.model.mattermost.MattermostAttachment;
 import com.example.mattermostbridge.model.mattermost.MattermostMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,19 +25,25 @@ public class BitbucketMessageConverter {
     }
 
     public MattermostMessage convertToMuttermostMessage(BitbucketMessage data) {
-        BitbucketPullRequest pr = data.getPullRequest();
+        BitbucketPullRequest pullRequest = data.getPullRequest();
+        BitbucketPullRequestSource toRef = pullRequest.getToRef();
+        BitbucketRepository repository = toRef.getRepository();
+        BitbucketProject project = repository.getProject();
+        BitbucketActor actor = data.getActor();
+        BitbucketEventType eventKey = data.getEventKey();
 
+        String actorName = actor.getName();
         String repositoryUrl = String.format("%s/projects/%s/repos/%s", bitbucketUrl,
-                pr.getToRef().getRepository().getProject().getKey(), pr.getToRef().getRepository().getName());
-        String prUrl = String.format("%s/pull-requests/%s/overview", repositoryUrl, pr.getId());
-        String prLink = String.format("[%s](%s)", pr.getTitle(), prUrl);
+                project.getKey(), repository.getName());
+        String pullRequestUrl = String.format("%s/pull-requests/%s/overview", repositoryUrl, pullRequest.getId());
+        String pullRequestLink = String.format("[%s](%s)", pullRequest.getTitle(), pullRequestUrl);
 
         MattermostAttachment attachment = MattermostAttachment.builder()
                 .color("#FFFFFF")
-                .authorName(String.format("%s (%s)", data.getActor().getDisplayName(), data.getActor().getName()))
-                .authorLink(String.format("%s/users/%s", bitbucketUrl, data.getActor().getName()))
-                .authorIcon(String.format("%s/users/%s/avatar.png", bitbucketUrl, data.getActor().getName()))
-                .text(String.format("%s pull request %s", data.getEventKey().getValue(), prLink))
+                .authorName(String.format("%s (%s)", actor.getDisplayName(), actorName))
+                .authorLink(String.format("%s/users/%s", bitbucketUrl, actorName))
+                .authorIcon(String.format("%s/users/%s/avatar.png", bitbucketUrl, actorName))
+                .text(String.format("%s pull request %s", eventKey.getValue(), pullRequestLink))
                 .build();
 
         return MattermostMessage.builder()
