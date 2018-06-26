@@ -25,13 +25,10 @@ public class MattermostServiceImpl implements MattermostService {
 
     @Override
     public void sendMessage(MattermostRequest request) {
-        String url = String.format(MATTERMOST_URL_TEMPLATE, mattermostUrl, request.getUri());
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
+        String url = String.format(MATTERMOST_URL_TEMPLATE, mattermostUrl, request.getUri());
         HttpEntity<MattermostMessage> entity = new HttpEntity<>(request.getMessage(), headers);
-
-        restTemplate.postForObject(url, entity, String.class);
+        restTemplate.postForLocation(url, entity);
     }
 }
