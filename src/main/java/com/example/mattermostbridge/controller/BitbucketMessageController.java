@@ -22,8 +22,8 @@ public class BitbucketMessageController {
         this.mattermostService = mattermostService;
     }
 
-    @PostMapping(value = "/{hook}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void hook(@RequestBody BitbucketMessage bitbucketMessage, @PathVariable("hook") String hook) {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void hook(@RequestBody BitbucketMessage bitbucketMessage, @RequestParam String hook) {
         MattermostMessage mattermostMessage = conversionService.convert(bitbucketMessage, MattermostMessage.class);
         MattermostRequest request = MattermostRequest.builder()
                 .message(mattermostMessage)
